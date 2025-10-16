@@ -12,13 +12,13 @@ def generate_voice():
     lang = lang_var.get()
 
     if not text:
-        messagebox.showwarning("Peringatan", "Teks tidak boleh kosong!")
+        messagebox.showwarning("Warning", "Teks must be not empty!")
         return
 
     try:
         os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-        # Nama file + timestamp
+        # Name + timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"{OUTPUT_DIR}/{timestamp}_output.mp3"
 
@@ -27,10 +27,10 @@ def generate_voice():
         tts.save(filename)
 
         add_to_table(filename)
-        messagebox.showinfo("Sukses", f"Audio disimpan di:\n{filename}")
+        messagebox.showinfo("Success", f"Audio saved in:\n{filename}")
 
     except Exception as e:
-        messagebox.showerror("Error", f"Gagal membuat audio:\n{e}")
+        messagebox.showerror("Error", f"Failid make audio:\n{e}")
 
 def add_to_table(filepath):
     name = os.path.basename(filepath)
@@ -51,7 +51,7 @@ def load_existing_files():
 def play_selected():
     selected = tree.selection()
     if not selected:
-        messagebox.showwarning("Peringatan", "Pilih file dulu!")
+        messagebox.showwarning("Warning", "Plase choose one!")
         return
     filename = tree.item(selected[0], "values")[0]
     filepath = os.path.join(OUTPUT_DIR, filename)
@@ -62,18 +62,18 @@ def play_selected():
         elif os.name == 'posix':
             os.system(f'open {filepath}' if os.uname().sysname == 'Darwin' else f'xdg-open {filepath}')
     else:
-        messagebox.showerror("Error", "File tidak ditemukan!")
+        messagebox.showerror("Error", "File not found!")
 
 def delete_selected():
     selected = tree.selection()
     if not selected:
-        messagebox.showwarning("Peringatan", "Pilih file yang ingin dihapus!")
+        messagebox.showwarning("Warning", "Please choose file!")
         return
 
     filename = tree.item(selected[0], "values")[0]
     filepath = os.path.join(OUTPUT_DIR, filename)
 
-    confirm = messagebox.askyesno("Konfirmasi", f"Hapus file '{filename}'?")
+    confirm = messagebox.askyesno("Confirmation", f"Hapus file '{filename}'?")
     if confirm:
         try:
             if os.path.exists(filepath):
@@ -81,16 +81,16 @@ def delete_selected():
             tree.delete(selected[0])
             messagebox.showinfo("Info", f"File '{filename}' dihapus.")
         except Exception as e:
-            messagebox.showerror("Error", f"Gagal menghapus file:\n{e}")
+            messagebox.showerror("Error", f"Failed remove file:\n{e}")
 
 # === GUI ===
 root = tk.Tk()
-root.title("🎙️ Simple TTS Apps - Tritronik")
+root.title("Simple TTS Apps - dekadev")
 root.geometry("650x550")
 root.resizable(False, False)
 
 # Label dan input teks
-label = tk.Label(root, text="Masukkan teks yang ingin diubah jadi suara:")
+label = tk.Label(root, text="Enter the text you want to convert to voice:")
 label.pack(pady=8)
 
 text_box = tk.Text(root, height=6, width=75)
@@ -100,7 +100,7 @@ text_box.pack(pady=5)
 lang_frame = tk.Frame(root)
 lang_frame.pack(pady=5)
 
-tk.Label(lang_frame, text="Pilih Bahasa:").pack(side="left", padx=5)
+tk.Label(lang_frame, text="Select Language").pack(side="left", padx=5)
 
 lang_var = tk.StringVar(value="id")
 lang_menu = ttk.Combobox(lang_frame, textvariable=lang_var, values=[
@@ -117,18 +117,18 @@ button = tk.Button(root, text="🎤 Generate Voice", command=generate_voice,
 button.pack(pady=10)
 
 # Label tabel
-tk.Label(root, text="Daftar File Output:").pack()
+tk.Label(root, text="List Output Files:").pack()
 
 # Frame tabel
-frame = tk.Frame(root, padx=10, pady=5)
+frame = tk.Frame(root, padx=20, pady=5)
 frame.pack(pady=5, fill="both", expand=True)
 
-columns = ("Nama File", "Tanggal Dibuat")
+columns = ("Name", "Date")
 tree = ttk.Treeview(frame, columns=columns, show="headings", height=10)
-tree.heading("Nama File", text="Nama File")
-tree.heading("Tanggal Dibuat", text="Tanggal Dibuat")
-tree.column("Nama File", width=350)
-tree.column("Tanggal Dibuat", width=250)
+tree.heading("Name", text="Name")
+tree.heading("Date", text="Date")
+tree.column("Name", width=350)
+tree.column("Date", width=250)
 
 # Scrollbar
 scrollbar = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
